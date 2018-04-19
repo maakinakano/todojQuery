@@ -23,13 +23,33 @@ function init() {
 }
 
 function makeTodo(todoName) {
+    const checkbox_th = $('<th>')
+                            .attr('class', 'checkbox_th')
+                            .html('<input type="checkbox" class="done_check" onclick="onCheck(this)">');
+    const text_th = $('<th>')
+                        .attr('class', 'text_th')
+                        .html(todoName).dblclick((e)=>{onClickEdit($(e.target))});
+    const erase_th = $('<th>')
+                        .attr('class', 'erase_th')
+                        .html('<input type="button" onclick="onclickErase(this)">');
+
     return $('<tr>').attr({
             class: 'todo'
-        }).append(
-            $('<th>').attr('class', 'checkbox_th').html('<input type="checkbox" class="done_check" onclick="onCheck(this)">'),
-            $('<th>').attr({
-                class: 'text_th',
-                ondblclick: 'onClickEdit(this)'
-            }).html(todoName),
-            $('<th>').attr('class', 'erase_th').html('<input type="button" onclick="onclickErase(this)">'));
+        }).append(checkbox_th, text_th, erase_th);
+}
+
+function onClickEdit(th) {
+    const input = $('<input>')
+                    .attr({
+                        type: 'text',
+                        class: 'input_todo_box',
+                        value: th.text()
+                    })
+                    .blur((e)=>{onBlurEdit($(e.target))})
+    th.html(input);
+    th.children().eq(0).focus();
+}
+
+function onBlurEdit(input) {
+    input.parent().html(input.val());
 }
