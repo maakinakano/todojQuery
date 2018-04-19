@@ -25,13 +25,18 @@ function init() {
 function makeTodo(todoName) {
     const checkbox_th = $('<th>')
                             .attr('class', 'checkbox_th')
-                            .html('<input type="checkbox" class="done_check" onclick="onCheck(this)">');
+                            .html(
+                                $('<input>').attr({
+                                    type: 'checkbox',
+                                    class: 'done_check'
+                                }).click((e) => {onCheck($(e.target))})
+                            );
     const text_th = $('<th>')
                         .attr('class', 'text_th')
                         .html(todoName).dblclick((e)=>{onClickEdit($(e.target))});
     const erase_th = $('<th>')
                         .attr('class', 'erase_th')
-                        .html('<input type="button" onclick="onclickErase(this)">');
+                        .html($('<input>').attr('type', 'button').click((e)=>{onclickErase($(e.target));}));
 
     return $('<tr>').attr({
             class: 'todo'
@@ -52,4 +57,20 @@ function onClickEdit(th) {
 
 function onBlurEdit(input) {
     input.parent().html(input.val());
+}
+
+function onclickErase(button) {
+    button.parent().parent().remove();
+}
+
+function onCheck(checkBox) {
+    flipDoneTodo(checkBox.parent().next(), checkBox.prop('checked'));
+}
+
+function flipDoneTodo(todoText, isDone) {
+	if(isDone) {
+		todoText.attr('class', 'text_ths');
+	} else {
+		todoText.attr('class', 'text_th');
+	}
 }
