@@ -1,6 +1,7 @@
 ///read
 function readTodo(id) {
 	const str = localStorage['todo-' + id]
+	console.log(str)
 	if(str === '') {
 		return false
 	}

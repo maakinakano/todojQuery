@@ -13,32 +13,38 @@ function init() {
 		$('#todo_list').append(makeTodo(id, todo))
 		writeTodo(id, todo)
 		e.target.value = ""
+		refiltering()
 	})
+	$('#filter_button').children().each((i, element)=>{
+		$(element).click((e)=>{
+			filtering($(e.target).val())
+		})
+	})
+
 	const todoNum = readTodoNum()
 	const todoList = $('#todo_list')
-	console.log(todoNum)
 	for(let i=0; i<todoNum; i++) {
+		console.log(i)
 		const todo = readTodo(i)
 		if(!todo){
 			continue
 		}
-		todoList.append(makeTodo(i, todo))
+		todoList.append(makeTodo(i, todo, false))
 	}
 }
 
 function makeTodo(id, todo) {
-	const checkbox = $('<input>').attr('type', 'checkbox').prop('checked', todo['isDOne']).click((e)=>{flipComplete($(e.target), $(e.target).prop('checked'))})
+	const checkbox = $('<input>').attr('type', 'checkbox').prop('checked', todo['isDone']).click((e)=>{flipComplete($(e.target), $(e.target).prop('checked'))})
 	const checkbox_th = $('<th class="checkbox_th">').html(checkbox)
 	const todoName_th = $('<th class="todoName_th">').html(todo['todoName']).dblclick((e)=>{onClickEdit($(e.target))})
 	const erase_th = $('<th class="erase_th">').html($('<input type="button">').click((e)=>{onErase($(e.target))}))
-	const tr = $('<tr>').attr('name', id).append(checkbox_th, todoName_th, erase_th)
-	flipComplete(checkbox, todo['isDone'])
+	const tr = $('<tr class="todo_tr">').attr('name', id).append(checkbox_th, todoName_th, erase_th)
+	flipComplete(checkbox, todo['isDone'], false)
 	return tr
 }
 ///Š®—¹
-function flipComplete(target, isDone) {
+function flipComplete(target, isDone, shouldWrite=true) {
 	const todoName_th = target.parent().next()
-	updateIsDone(target.parent().parent().attr('name'),isDone)
 	if(isDone) {
 		todoName_th.css({
 			'text-decoration': 'line-through',
@@ -49,6 +55,10 @@ function flipComplete(target, isDone) {
 			'text-decoration': 'none',
 			'color': 'black'
 		})
+	}
+	if(shouldWrite) {
+		updateIsDone(target.parent().parent().attr('name'),isDone)
+		refiltering()
 	}
 }
 
@@ -77,4 +87,22 @@ function onErase(target) {
 	const target_tr = target.parent().parent()
 	removeTodo(target_tr.attr('name'))
 	target_tr.remove()
+}
+
+
+function filtering(mode) {
+	const todos = $('.todo_tr').each((i, element)=>{
+		const check = $(element).find('input[type="checkbox"]').prop('checked')
+		if(mode === 'active' && check) {
+			$(element).hide()
+		} else if(mode === 'completed' && !check) {
+			$(element).hide()
+		} else {
+			$(element).show()
+		}
+	})
+}
+
+function refiltering() {
+	filtering($('input[name="filter"]:checked').val())
 }
