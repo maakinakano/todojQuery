@@ -1,5 +1,6 @@
 function init() {
 	storageInit()
+	///event handlerの設定
 	$('#todo_input').keydown(function(e) {
 		const todoName = e.target.value
 		if(e.keyCode !== 13 || todoName === ''){
@@ -15,26 +16,34 @@ function init() {
 		e.target.value = ""
 		refiltering()
 	})
+	$('#all_checkbox').click((e)=>{
+		const check = $(e.target).prop('checked')
+		$('.todo_tr input[type="checkbox"]').each((i, checkbox)=>{
+			$(checkbox).prop('checked', check)
+			flipComplete($(checkbox), check)
+		})
+	})
 	$('#filter_button').children().each((i, element)=>{
 		$(element).click((e)=>{
 			filtering($(e.target).val())
 		})
 	})
-
+	$('#debug').click((e)=>{
+		storageInitHard()
+		location.reload()
+	})
+	///Todoの読み込み
 	const todoNum = readTodoNum()
 	const todoList = $('#todo_list')
 	for(let i=0; i<todoNum; i++) {
-		console.log(i)
 		const todo = readTodo(i)
 		if(!todo){
 			continue
 		}
 		todoList.append(makeTodo(i, todo, false))
 	}
-	$('#debug').click((e)=>{
-		storageInitHard()
-		location.reload()
-	})
+	///allcheckboxのチェックの変更
+	recheckAllCheckBox()
 }
 
 function makeTodo(id, todo) {
@@ -64,8 +73,18 @@ function flipComplete(target, isDone, shouldWrite=true) {
 		updateIsDone(target.parent().parent().attr('name'),isDone)
 		refiltering()
 	}
+	recheckAllCheckBox()
 }
 
+function recheckAllCheckBox() {
+	let isAllCheck = true
+	$('.todo_tr input[type="checkbox"]').each((i, checkbox)=>{
+		isAllCheck &= $(checkbox).prop('checked')
+	})
+	$('#all_checkbox').prop('checked', isAllCheck)
+}
+function countActive() {
+}
 ///編集
 function onClickEdit(target) {
 	target.html($('<input type="text" class="todo_edit">').val(target.text()).blur((e)=>{onBlurEdit($(e.target))})).keydown((e)=>{
@@ -93,9 +112,9 @@ function onErase(target) {
 	target_tr.remove()
 }
 
-
+///フィルタリング
 function filtering(mode) {
-	const todos = $('.todo_tr').each((i, element)=>{
+	$('.todo_tr').each((i, element)=>{
 		const check = $(element).find('input[type="checkbox"]').prop('checked')
 		if(mode === 'active' && check) {
 			$(element).hide()
@@ -110,3 +129,4 @@ function filtering(mode) {
 function refiltering() {
 	filtering($('input[name="filter"]:checked').val())
 }
+
