@@ -33,6 +33,11 @@ function init() {
 		storageInitHard()
 		location.reload()
 	})
+	$('#clear_completed').click((e)=>{
+		$('.todo_tr input[type="checkbox"]:checked').each((i, checkbox)=>{
+			onErase($(checkbox).parent().next().next().children().eq(0))
+		})
+	})
 	///Todo‚Ì“Ç‚İ‚İ
 	const todoNum = readTodoNum()
 	const todoList = $('#todo_list')
