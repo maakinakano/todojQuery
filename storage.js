@@ -44,7 +44,7 @@ function readAndIncTodoNum() {
 
 ///èâä˙âª
 function storageInit() {
-	if(localStorage['todoNum'] === '') {
+	if(!localStorage['todoNum']) {
 		localStorage['todoNum'] = 0
 	}
 }
