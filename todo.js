@@ -15,6 +15,7 @@ function init() {
 		writeTodo(id, todo)
 		e.target.value = ""
 		refiltering()
+		reflectTasks()
 	})
 	$('#all_checkbox').click((e)=>{
 		const check = $(e.target).prop('checked')
@@ -43,7 +44,7 @@ function init() {
 		todoList.append(makeTodo(i, todo, false))
 	}
 	///allcheckboxのチェックの変更
-	recheckAllCheckBox()
+	reflectTasks()
 }
 
 function makeTodo(id, todo) {
@@ -54,6 +55,41 @@ function makeTodo(id, todo) {
 	const tr = $('<tr class="todo_tr">').attr('name', id).append(checkbox_th, todoName_th, erase_th)
 	flipComplete(checkbox, todo['isDone'], false)
 	return tr
+}
+
+function reflectTasks() {
+	recheckAllCheckBox()
+	countActive()
+	countTaskNum()
+}
+function recheckAllCheckBox() {
+	let isAllCheck = true
+	$('.todo_tr input[type="checkbox"]').each((i, checkbox)=>{
+		isAllCheck &= $(checkbox).prop('checked')
+	})
+	$('#all_checkbox').prop('checked', isAllCheck)
+}
+function countActive() {
+	let count = 0;
+	$('.todo_tr input[type="checkbox"]').each((i, checkbox)=>{
+		if(!$(checkbox).prop('checked')){
+			count++;
+		}
+	})
+	$('#item_left').html(count+' item left')
+}
+function countTaskNum() {
+	let count = 0;
+	$('.todo_tr input[type="checkbox"]').each((i, checkbox)=>{
+		count++;
+	})
+	if(count == 0){
+		$('#all_checkbox').hide()
+		$('#filter_button').hide()
+	} else {
+		$('#all_checkbox').show()
+		$('#filter_button').show()
+	}
 }
 ///完了
 function flipComplete(target, isDone, shouldWrite=true) {
@@ -73,18 +109,9 @@ function flipComplete(target, isDone, shouldWrite=true) {
 		updateIsDone(target.parent().parent().attr('name'),isDone)
 		refiltering()
 	}
-	recheckAllCheckBox()
+	reflectTasks()
 }
 
-function recheckAllCheckBox() {
-	let isAllCheck = true
-	$('.todo_tr input[type="checkbox"]').each((i, checkbox)=>{
-		isAllCheck &= $(checkbox).prop('checked')
-	})
-	$('#all_checkbox').prop('checked', isAllCheck)
-}
-function countActive() {
-}
 ///編集
 function onClickEdit(target) {
 	target.html($('<input type="text" class="todo_edit">').val(target.text()).blur((e)=>{onBlurEdit($(e.target))})).keydown((e)=>{
@@ -110,6 +137,7 @@ function onErase(target) {
 	const target_tr = target.parent().parent()
 	removeTodo(target_tr.attr('name'))
 	target_tr.remove()
+	reflectTasks()
 }
 
 ///フィルタリング
