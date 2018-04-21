@@ -31,6 +31,10 @@ function init() {
 		}
 		todoList.append(makeTodo(i, todo, false))
 	}
+	$('#debug').click((e)=>{
+		storageInitHard()
+		location.reload()
+	})
 }
 
 function makeTodo(id, todo) {

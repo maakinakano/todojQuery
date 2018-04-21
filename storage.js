@@ -1,7 +1,6 @@
 ///read
 function readTodo(id) {
 	const str = localStorage['todo-' + id]
-	console.log(str)
 	if(str === '') {
 		return false
 	}
@@ -48,4 +47,7 @@ function storageInit() {
 	if(localStorage['todoNum'] === '') {
 		localStorage['todoNum'] = 0
 	}
+}
+function storageInitHard() {
+	localStorage['todoNum'] = 0
 }
