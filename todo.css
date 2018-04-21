@@ -25,6 +25,15 @@ th.checkbox_th {
 th.input_th {
 	width: 620px;
 }
+
+th.todoName_th {
+	text-align: left;
+	font-size: 30px;
+	font-weight: 100;
+	width: 620px;
+	
+}
+
 th.erase_th {
 	width: 25px;
 }
