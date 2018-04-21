@@ -1,24 +1,44 @@
 function init() {
+	storageInit()
 	$('#todo_input').keydown(function(e) {
-		if(e.keyCode !== 13 || e.target.value === ''){
+		const todoName = e.target.value
+		if(e.keyCode !== 13 || todoName === ''){
 			return
 		}
-		
-		
-		$('#todo_list').append(makeTodo(e.target.value))
+		const todo = {
+			'todoName': todoName,
+			'isDone': false
+		}
+		const id = readAndIncTodoNum()
+		$('#todo_list').append(makeTodo(id, todo))
+		writeTodo(id, todo)
 		e.target.value = ""
 	})
+	const todoNum = readTodoNum()
+	const todoList = $('#todo_list')
+	console.log(todoNum)
+	for(let i=0; i<todoNum; i++) {
+		const todo = readTodo(i)
+		if(!todo){
+			continue
+		}
+		todoList.append(makeTodo(i, todo))
+	}
 }
 
-function makeTodo(todoName) {
-	const checkbox_th = $('<th class="checkbox_th">').html($('<input>').attr('type', 'checkbox').click((e)=>{flipComplete($(e.target), $(e.target).prop('checked'))}))
-	const todoName_th = $('<th class="todoName_th">').html(todoName).dblclick((e)=>{onClickEdit($(e.target))})
+function makeTodo(id, todo) {
+	const checkbox = $('<input>').attr('type', 'checkbox').prop('checked', todo['isDOne']).click((e)=>{flipComplete($(e.target), $(e.target).prop('checked'))})
+	const checkbox_th = $('<th class="checkbox_th">').html(checkbox)
+	const todoName_th = $('<th class="todoName_th">').html(todo['todoName']).dblclick((e)=>{onClickEdit($(e.target))})
 	const erase_th = $('<th class="erase_th">').html($('<input type="button">').click((e)=>{onErase($(e.target))}))
-	return $('<tr>').append(checkbox_th, todoName_th, erase_th)
+	const tr = $('<tr>').attr('name', id).append(checkbox_th, todoName_th, erase_th)
+	flipComplete(checkbox, todo['isDone'])
+	return tr
 }
 ///äÆóπ
 function flipComplete(target, isDone) {
-	const todoName_th = target.parent().next();
+	const todoName_th = target.parent().next()
+	updateIsDone(target.parent().parent().attr('name'),isDone)
 	if(isDone) {
 		todoName_th.css({
 			'text-decoration': 'line-through',
@@ -34,13 +54,27 @@ function flipComplete(target, isDone) {
 
 ///ï“èW
 function onClickEdit(target) {
-	target.html($('<input type="text" class="todo_edit">').val(target.text()).blur((e)=>{onBlurEdit($(e.target))}))
-	target.children().eq(0).focus();
+	target.html($('<input type="text" class="todo_edit">').val(target.text()).blur((e)=>{onBlurEdit($(e.target))})).keydown((e)=>{
+		if(e.keyCode !== 13){
+			return
+		}
+		onBlurEdit($(e.target))
+	})
+	target.children().eq(0).focus()
 }
 function onBlurEdit(target) {
-	target.parent().html(target.val())
+	const todoName = target.val()
+	if(todoName === '') {
+		onErase(target.parent().next().children().eq(0))
+		return
+	}
+	updateTodoName(target.parent().parent().attr('name'), todoName)
+	target.parent().html(todoName)
 }
+
 ///çÌèú
 function onErase(target) {
-	target.parent().parent().remove()
+	const target_tr = target.parent().parent()
+	removeTodo(target_tr.attr('name'))
+	target_tr.remove()
 }
